@@ -7,5 +7,6 @@ fi
 
 cd $(dirname $0)
 [ -f ./admins.env ] && . ./admins.env
+[ -f ./requirements.env ] && . ./requirements.env
 echo 'starting nina-bot'
 bin/hubot -n nina-bot -a shell
