@@ -99,6 +99,7 @@ execute_kits_age = (msg, branch) ->
 module.exports = (robot) ->
 #  robot.hear /kit/, (msg) ->
 #    msg.send "Need help on kits? ask me."
+  prefix = robot.alias or robot.name
 
   robot.router.post "/hubot/backup-status", (req,res) ->
     room = req.body.room
@@ -178,30 +179,30 @@ module.exports = (robot) ->
 
   robot.respond /kit help/i, (msg) ->
     msg.send "I can query your kit on any project (dev|dev-west|dev-east|itg|test|test-stable|pro|stable). Use those listed to do so:"
-    msg.send "nono-bot: who owns (kit|forj) <KIT> (dev|itg|test|test-stable|pro|stable)"
-    msg.send "nono-bot: kits owned by <email@hp.com>"
-    msg.send "nono-bot: kit list -- I will query dev-east project only."
-    msg.send "nono-bot: kit list on (dev|dev-west|dev-east|itg|test|test-stable|pro|stable)"
-    msg.send "nono-bot: kits registered (dev|itg|test|test-stable|pro|stable)"
-    msg.send "nono-bot: kits age (dev|itg|test|test-stable|pro|stable)"
-    msg.send "nono-bot: ip for kit <Kits> -- I will query dev project only."
-    msg.send "nono-bot: list IP for <Kits> from (dev|dev-west|dev-east|itg|test|test-stable|pro|stable)"
+    msg.send "#{prefix}: who owns (kit|forj) <KIT> (dev|itg|test|test-stable|pro|stable)"
+    msg.send "#{prefix}: kits owned by <email@hp.com>"
+    msg.send "#{prefix}: kit list -- I will query dev-east project only."
+    msg.send "#{prefix}: kit list on (dev|dev-west|dev-east|itg|test|test-stable|pro|stable)"
+    msg.send "#{prefix}: kits registered (dev|itg|test|test-stable|pro|stable)"
+    msg.send "#{prefix}: kits age (dev|itg|test|test-stable|pro|stable)"
+    msg.send "#{prefix}: ip for kit <Kits> -- I will query dev project only."
+    msg.send "#{prefix}: list IP for <Kits> from (dev|dev-west|dev-east|itg|test|test-stable|pro|stable)"
     msg.send "I can do some stuff on your kit, as listed below:"
-    msg.send "nono-bot: remove kit <Kits> -- I can remove kit only on master branch (dev-east)"
+    msg.send "#{prefix}: remove kit <Kits> -- I can remove kit only on master branch (dev-east)"
     msg.send "But I warn you. You will need to confirm me the action to do with 'go' OR 'abort'"
 
   robot.respond /forj help/i, (msg) ->
     msg.send "I can query your forj on any project (dev|dev-west|dev-east|itg|test|test-stable|pro|stable). Use those listed to do so:"
-    msg.send "nono-bot: who owns (forj) <FORJ> (dev|itg|test|test-stable|pro|stable)"
-    msg.send "nono-bot: forjs owned by <email@hp.com>"
-    msg.send "nono-bot: forj list -- I will query dev-east project only."
-    msg.send "nono-bot: forj list on (dev|dev-west|dev-east|itg|test|test-stable|pro|stable)"
-    msg.send "nono-bot: forjs registered (dev|itg|test|test-stable|pro|stable)"
-    msg.send "nono-bot: forjs age (dev|itg|test|test-stable|pro|stable)"
-    msg.send "nono-bot: ip for forj <forjs> -- I will query dev project only."
-    msg.send "nono-bot: list IP for <forjs> from (dev|dev-west|dev-east|itg|test|test-stable|pro|stable)"
+    msg.send "#{prefix}: who owns (forj) <FORJ> (dev|itg|test|test-stable|pro|stable)"
+    msg.send "#{prefix}: forjs owned by <email@hp.com>"
+    msg.send "#{prefix}: forj list -- I will query dev-east project only."
+    msg.send "#{prefix}: forj list on (dev|dev-west|dev-east|itg|test|test-stable|pro|stable)"
+    msg.send "#{prefix}: forjs registered (dev|itg|test|test-stable|pro|stable)"
+    msg.send "#{prefix}: forjs age (dev|itg|test|test-stable|pro|stable)"
+    msg.send "#{prefix}: ip for forj <forjs> -- I will query dev project only."
+    msg.send "#{prefix}: list IP for <forjs> from (dev|dev-west|dev-east|itg|test|test-stable|pro|stable)"
     msg.send "I can do some stuff on your forj, as listed below:"
-    msg.send "nono-bot: remove forj <forjs> -- I can remove forj only on master branch (dev-east)"
+    msg.send "#{prefix}: remove forj <forjs> -- I can remove forj only on master branch (dev-east)"
     msg.send "But I warn you. You will need to confirm me the action to do with 'go' OR 'abort'"
 
   robot.respond /(give  *me |get )* *(kit  *list|list  *kit|list  *of  *kit)  *on  *(dev|dev-west|dev-east|itg|test|test-stable|pro|stable) *$/i, (msg) ->
