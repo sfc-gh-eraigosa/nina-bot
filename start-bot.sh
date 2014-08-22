@@ -1,4 +1,8 @@
 #!/bin/bash
+if [ "$(id -u)" = "0" ] ;
+then
+  echo "WARNING: your running as root"
+fi
 if [ "$(pgrep node)" != "" ]
 then
   echo "Killing previous process... ($(pgrep node))"
@@ -9,4 +13,5 @@ cd $(dirname $0)
 [ -f ./admins.env ] && . ./admins.env
 [ -f ./requirements.env ] && . ./requirements.env
 echo 'starting nina-bot'
-nohup bin/hubot -n nina-bot -a xmpp >> /var/log/hubot.log 2>&1 &
+[ ! -d /var/log/hubot ] && mkdir -p /var/log/hubot
+nohup bin/hubot -n nina-bot -a xmpp >> /var/log/hubot/nina-bot.log 2>&1 &
