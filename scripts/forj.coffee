@@ -320,27 +320,13 @@ module.exports = (robot) ->
 # Commands:
 #   please remove kit <id> on <dev>
 ###########################
-  robot.respond /(please )*(remove  *kit|kit  *remove) ([a-z0-9 ]*) *on *(dev|dev-west|dev-east)/i, (msg) ->
+  robot.respond /(please )*(remove *(forj|kit)|(forj|kit) *remove) (([a-z0-9]|[a-z][a-z])*) *on *(dev|dev-west|dev-east)/i, (msg) ->
     try
       robot.logger.info "#{prefix} responding to -> #{msg.match}"
       kit = msg.match[3]
       env = msg.match[4]
       msg.send "env = #{env}"
       execute_hpcloud_remove msg, kit, env
-    catch err
-      robot.emit 'error: please remove kit <id> on <dev-west>', err
-
-###########################
-# Commands:
-#   please remove forj <id> on <dev>
-###########################
-  robot.respond /(please )*(remove  *forj|forj  *remove) ([a-z0-9 ]*) *on *(dev|dev-west|dev-east)/i, (msg) ->
-    try
-      robot.logger.info "#{prefix} responding to -> #{msg.match}"
-      forj = msg.match[3]
-      env = msg.match[4]
-      msg.send "env = #{env}"
-      execute_hpcloud_remove msg, forj, env
     catch err
       robot.emit 'error: please remove forj <id> on <dev-west>', err
 
