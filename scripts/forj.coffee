@@ -23,7 +23,7 @@ execute_hpcloud = (msg, branch) ->
   drush_spawn = spawn("hpcloud_cdk.sh", [ '--a' , branch ])
 
   drush_spawn.stdout.on "data", (data) ->
-    msg.send data
+    msg.send "#{data}"
 
   drush_spawn.stderr.on "data", (data) ->
     msg.send "Err: #{data}"
@@ -38,7 +38,7 @@ execute_hpcloud_remove = (msg, forj, env) ->
   drush_spawn = spawn("hpcloud_cdk.sh", [ '--a', env, '--prefix', forj, '--remove-kit', '--nono' ])
 
   drush_spawn.stdout.on "data", (data) ->
-    msg.send data
+    msg.send "#{data}"
 
   drush_spawn.stderr.on "data", (data) ->
     msg.send "Err: #{data}"
@@ -50,7 +50,7 @@ execute_hpcloud_ip = (msg, kit, branch) ->
   drush_spawn = spawn("hpcloud_cdk.sh", [ '--a', branch, '--prefix', kit, '--only-ip' ])
 
   drush_spawn.stdout.on "data", (data) ->
-    msg.send data
+    msg.send "#{data}"
 
   drush_spawn.stderr.on "data", (data) ->
     msg.send "Err: #{data}"
@@ -65,7 +65,7 @@ execute_hpcloud_go = (msg) ->
   drush_spawn = spawn("hpcloud_cdk.sh", [ '--a', 'dev', '--nono', '--go' ])
 
   drush_spawn.stdout.on "data", (data) ->
-    msg.send data
+    msg.send "#{data}"
 
   drush_spawn.stderr.on "data", (data) ->
     msg.send "Err: #{data}"
@@ -80,7 +80,7 @@ execute_hpcloud_abort = (msg) ->
   drush_spawn = spawn("hpcloud_cdk.sh", [ '--a', 'dev', '--nono', '--abort' ])
 
   drush_spawn.stdout.on "data", (data) ->
-    msg.send data
+    msg.send "#{data}"
 
   drush_spawn.stderr.on "data", (data) ->
     msg.send "Err: #{data}"
@@ -93,7 +93,7 @@ execute_kits_reg = (msg, branch) ->
   drush_spawn = spawn("registered.sh", [branch, url])
 
   drush_spawn.stdout.on "data", (data) ->
-    msg.send data
+    msg.send "#{data}"
 
   drush_spawn.stderr.on "data", (data) ->
     msg.send "Err: #{data}"
@@ -109,7 +109,7 @@ execute_kits_age = (msg, branch) ->
   drush_spawn = spawn("serverage.sh", [branch, url])
 
   drush_spawn.stdout.on "data", (data) ->
-    msg.send data
+    msg.send "#{data}"
 
   drush_spawn.stderr.on "data", (data) ->
     msg.send "Err: #{data}"
@@ -127,6 +127,15 @@ module.exports = (robot) ->
   prefix = robot.alias or robot.name
   robot.logger.info "processing #{prefix} forj brain "
 
+###########################
+# handle errors
+###########################
+  robot.error (err, msg) ->
+    if msg?
+       robot.logger.error "handling -> #{err} : #{msg}"
+       msg.reply "unable to continue. exception caught"
+    else
+       robot.logger.error "handling -> #{err.stack}"
 ###########################
 #
 ###########################
@@ -162,7 +171,6 @@ module.exports = (robot) ->
 #
 ###########################
   robot.router.get "/hubot/users", (req,res) ->
-
     users = util.inspect(robot.brain.users())
     res.end "#{users}\n"
 
@@ -219,7 +227,7 @@ module.exports = (robot) ->
 #
 ###########################
   robot.respond /kit help/i, (msg) ->
-    robot.logger.info "#{prefix} responding to -> #{msg}"
+    robot.logger.info "#{prefix} responding to -> #{msg.match}"
     msg.send "I can query your kit on any project (dev|dev-west|dev-east|itg|test|test-stable|pro|stable). Use those listed to do so:"
     msg.send "#{prefix}: who owns (kit|forj) <KIT> (dev|itg|test|test-stable|pro|stable)"
     msg.send "#{prefix}: kits owned by <email@hp.com>"
@@ -237,6 +245,7 @@ module.exports = (robot) ->
 # forj help
 ###########################
   robot.respond /forj help/i, (msg) ->
+    robot.logger.info "#{prefix} responding to -> #{msg.match}"
     msg.send "I can query your forj on any project (dev|dev-west|dev-east|itg|test|test-stable|pro|stable). Use those listed to do so:"
     msg.send "#{prefix}: who owns (forj) <FORJ> (dev|itg|test|test-stable|pro|stable)"
     msg.send "#{prefix}: forjs owned by <email@hp.com>"
@@ -254,7 +263,7 @@ module.exports = (robot) ->
 # kit list on dev
 ###########################
   robot.respond /(give  *me |get )* *(kit  *list|list  *kit|list  *of  *kit)  *on  *(dev|dev-west|dev-east|itg|test|test-stable|pro|stable) *$/i, (msg) ->
-    robot.logger.info "#{prefix} responding to -> #{msg}"
+    robot.logger.info "#{prefix} responding to -> #{msg.match}"
     branch = msg.match[3]
     execute_hpcloud msg, branch
 
@@ -262,17 +271,20 @@ module.exports = (robot) ->
 # forj list on dev
 ###########################
   robot.respond /(give  *me |get )* *(forj  *list|list  *forj|list  *of  *forj)  *on  *(dev|dev-west|dev-east|itg|test|test-stable|pro|stable) *$/i, (msg) ->
+    robot.logger.info "#{prefix} responding to -> #{msg.match}"
     branch = msg.match[3]
-
     execute_hpcloud msg, branch
 
 ###########################
-# kit lis
+# kit list
 ###########################
   robot.respond /(give me |get )* *(kit(s)*  *list|list  *(of )* *kit(s)*)$/i, (msg) ->
-    robot.logger.info "#{prefix} responding to -> #{msg}"
-    branch = 'dev'
-    execute_hpcloud msg, branch
+    try
+      robot.logger.info "#{prefix} responding to -> #{msg.match}"
+      branch = 'dev'
+      execute_hpcloud msg, branch
+    catch err
+      robot.emit 'error', err
 
 ###########################
 #
@@ -280,7 +292,7 @@ module.exports = (robot) ->
   robot.respond /(please )*(remove  *kit|kit  *remove) ([a-z0-9 ]*) *on *(dev-west|dev-east)/i, (msg) ->
     kit = msg.match[3]
     env = msg.match[4]
-    msg.send "env = " + env
+    msg.send "env = #{env}"
     execute_hpcloud_remove msg, kit, env
 
 ###########################
@@ -289,7 +301,7 @@ module.exports = (robot) ->
   robot.respond /(please )*(remove  *forj|forj  *remove) ([a-z0-9 ]*) *on *(dev-west|dev-east)/i, (msg) ->
     forj = msg.match[3]
     env = msg.match[4]
-    msg.send "env = " + env
+    msg.send "env = #{env}"
     execute_hpcloud_remove msg, forj, env
 
 ###########################
