@@ -154,7 +154,7 @@ module.exports = (robot) ->
       msg.send "#{prefix}: ip for kit <Kits> -- I will query dev project only."
       msg.send "#{prefix}: list IP for <Kits> from (dev|dev-west|dev-east|itg|test|test-stable|pro|stable)"
       msg.send "I can do some stuff on your kit, as listed below:"
-      msg.send "#{prefix}: remove kit <Kits> -- I can remove kit only on master branch (dev-east)"
+      msg.send "#{prefix}: remove kit <id> on <dev> -- I can remove kit only on master branch (dev-east)"
       msg.send "But I warn you. You will need to confirm me the action to do with 'go' OR 'abort'"
     catch err
       robot.emit 'error: kit help', err
@@ -176,7 +176,7 @@ module.exports = (robot) ->
       msg.send "#{prefix}: ip for forj <forjs> -- I will query dev project only."
       msg.send "#{prefix}: list ip for <forjs> from (dev|dev-west|dev-east|itg|test|test-stable|pro|stable)"
       msg.send "I can do some stuff on your forj, as listed below:"
-      msg.send "#{prefix}: remove forj <forjs> -- I can remove forj only on master branch (dev-east)"
+      msg.send "#{prefix}: remove forj <id> on <dev> -- I can remove forj only on master branch (dev-east)"
       msg.send "But I warn you. You will need to confirm me the action to do with 'go' OR 'abort'"
     catch err
       robot.emit 'error: forj help', err
@@ -318,9 +318,9 @@ module.exports = (robot) ->
 
 ###########################
 # Commands:
-#   please remove kit <id> on <dev-west>
+#   please remove kit <id> on <dev>
 ###########################
-  robot.respond /(please )*(remove  *kit|kit  *remove) ([a-z0-9 ]*) *on *(dev-west|dev-east)/i, (msg) ->
+  robot.respond /(please )*(remove  *kit|kit  *remove) ([a-z0-9 ]*) *on *(dev|dev-west|dev-east)/i, (msg) ->
     try
       robot.logger.info "#{prefix} responding to -> #{msg.match}"
       kit = msg.match[3]
@@ -332,9 +332,9 @@ module.exports = (robot) ->
 
 ###########################
 # Commands:
-#   please remove forj <id> on <dev-west>
+#   please remove forj <id> on <dev>
 ###########################
-  robot.respond /(please )*(remove  *forj|forj  *remove) ([a-z0-9 ]*) *on *(dev-west|dev-east)/i, (msg) ->
+  robot.respond /(please )*(remove  *forj|forj  *remove) ([a-z0-9 ]*) *on *(dev|dev-west|dev-east)/i, (msg) ->
     try
       robot.logger.info "#{prefix} responding to -> #{msg.match}"
       forj = msg.match[3]
