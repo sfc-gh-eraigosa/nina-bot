@@ -305,8 +305,10 @@ module.exports = (robot) ->
 ###########################
 # Commands:
 #   kit list
+#   give me kit list
+#   get kit list
 ###########################
-  robot.respond /(give me |get )* *(kit(s)*  *list|list  *(of )* *kit(s)*)$/i, (msg) ->
+  robot.respond /(give me |get )* *((kit(s)|forj)*  *list|list  *(of )* *(kit(s)|forj)*)$/i, (msg) ->
     try
       robot.logger.info "#{prefix} responding to -> #{msg.match}"
       branch = 'dev'
