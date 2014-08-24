@@ -139,47 +139,26 @@ module.exports = (robot) ->
 
 ###########################
 # Commands:
-#   kit help
-###########################
-  robot.respond /kit help/i, (msg) ->
-    try
-      robot.logger.info "#{prefix} responding to -> #{msg.match}"
-      msg.send "I can query your kit on any project (dev|dev-west|dev-east|itg|test|test-stable|pro|stable). Use those listed to do so:"
-      msg.send "#{prefix}: kit list -- I will query dev-east project only."
-      msg.send "#{prefix}: kit list on (dev|dev-west|dev-east|itg|test|test-stable|pro|stable)"
-      msg.send "#{prefix}: who owns kit <id> on (dev|itg|test|test-stable|pro|stable)"
-      msg.send "#{prefix}: kits owned by <user@domain> on <dev>"
-      msg.send "#{prefix}: kits registered on (dev|itg|test|test-stable|pro|stable)"
-      msg.send "#{prefix}: kits age on (dev|itg|test|test-stable|pro|stable)"
-      msg.send "#{prefix}: ip for kit <Kits> -- I will query dev project only."
-      msg.send "#{prefix}: list IP for <Kits> from (dev|dev-west|dev-east|itg|test|test-stable|pro|stable)"
-      msg.send "I can do some stuff on your kit, as listed below:"
-      msg.send "#{prefix}: remove kit <id> on <dev> -- I can remove kit only on master branch (dev-east)"
-      msg.send "But I warn you. You will need to confirm me the action to do with 'go' OR 'abort'"
-    catch err
-      robot.emit 'error: kit help', err
-
-###########################
-# Commands:
 #   forj help
 ###########################
-  robot.respond /forj help/i, (msg) ->
+  robot.respond /(kit|forj) help/i, (msg) ->
     try
       robot.logger.info "#{prefix} responding to -> #{msg.match}"
+      type = msg.match[1]
       msg.send "I can query your forj on any project (dev|dev-west|dev-east|itg|test|test-stable|pro|stable). Use those listed to do so:"
-      msg.send "#{prefix}: who owns forj <id> on (dev|itg|test|test-stable|pro|stable)"
-      msg.send "#{prefix}: forj list -- I will query dev-east project only."
-      msg.send "#{prefix}: forj list on (dev|dev-west|dev-east|itg|test|test-stable|pro|stable)"
-      msg.send "#{prefix}: forjs owned by <email@hp.com> on <dev>"
-      msg.send "#{prefix}: forjs registered on (dev|itg|test|test-stable|pro|stable)"
-      msg.send "#{prefix}: forjs age on (dev|itg|test|test-stable|pro|stable)"
-      msg.send "#{prefix}: ip for forj <forjs> -- I will query dev project only."
-      msg.send "#{prefix}: list ip for <forjs> from (dev|dev-west|dev-east|itg|test|test-stable|pro|stable)"
-      msg.send "I can do some stuff on your forj, as listed below:"
-      msg.send "#{prefix}: remove forj <id> on <dev> -- I can remove forj only on master branch (dev-east)"
+      msg.send "#{prefix}: who owns #{type} <id> on (dev|itg|test|test-stable|pro|stable)"
+      msg.send "#{prefix}: #{type} list -- I will query dev-east project only."
+      msg.send "#{prefix}: #{type} list on (dev|dev-west|dev-east|itg|test|test-stable|pro|stable)"
+      msg.send "#{prefix}: #{type}s owned by <email@hp.com> on <dev>"
+      msg.send "#{prefix}: #{type}s registered on (dev|itg|test|test-stable|pro|stable)"
+      msg.send "#{prefix}: #{type}s age on (dev|itg|test|test-stable|pro|stable)"
+      msg.send "#{prefix}: ip for #{type} <forjs> -- I will query dev project only."
+      msg.send "#{prefix}: list ip for #{type}s from (dev|dev-west|dev-east|itg|test|test-stable|pro|stable)"
+      msg.send "I can do some stuff on your #{type}, as listed below:"
+      msg.send "#{prefix}: remove #{type} <id> on <dev> -- I can remove #{type} only on master branch (dev-east)"
       msg.send "But I warn you. You will need to confirm me the action to do with 'go' OR 'abort'"
     catch err
-      robot.emit 'error: forj help', err
+      robot.emit 'error: #{type} help', err
 
 ###########################
 #
@@ -281,20 +260,9 @@ module.exports = (robot) ->
 ###########################
 # Commands:
 #   kit list on <dev>
-###########################
-  robot.respond /(give  *me |get )* *(kit  *list|list  *kit|list  *of  *kit)  *on  *(dev|dev-west|dev-east|itg|test|test-stable|pro|stable) *$/i, (msg) ->
-    try
-      robot.logger.info "#{prefix} responding to -> #{msg.match}"
-      branch = msg.match[3]
-      execute_hpcloud msg, branch
-    catch err
-      robot.emit 'error: kit list on <dev>', err
-
-###########################
-# Commands:
 #   forj list on <dev>
 ###########################
-  robot.respond /(give  *me |get )* *(forj  *list|list  *forj|list  *of  *forj)  *on  *(dev|dev-west|dev-east|itg|test|test-stable|pro|stable) *$/i, (msg) ->
+  robot.respond /(give  *me |get )* *(kit *list|list  *kit|list *of *kit|forj  *list|list  *forj|list  *of  *forj)  *on  *(dev|dev-west|dev-east|itg|test|test-stable|pro|stable) *$/i, (msg) ->
     try
       robot.logger.info "#{prefix} responding to -> #{msg.match}"
       branch = msg.match[3]
@@ -304,11 +272,12 @@ module.exports = (robot) ->
 
 ###########################
 # Commands:
+#   forj list
 #   kit list
 #   give me kit list
 #   get kit list
 ###########################
-  robot.respond /(give me |get )* *((kit(s)|forj)*  *list|list  *(of )* *(kit(s)|forj)*)$/i, (msg) ->
+  robot.respond /(give me |get )* *((kit|kits|forj)*  *list|list  *(of )* *(kit|kits|forj)*)$/i, (msg) ->
     try
       robot.logger.info "#{prefix} responding to -> #{msg.match}"
       branch = 'dev'
@@ -318,9 +287,9 @@ module.exports = (robot) ->
 
 ###########################
 # Commands:
-#   please remove kit <id> on <dev>
+#   please remove forj <id> on <dev>
 ###########################
-  robot.respond /(please )*(remove *(forj|kit)|(forj|kit) *remove) (([a-z0-9]|[a-z][a-z])*) *on *(dev|dev-west|dev-east)/i, (msg) ->
+  robot.respond /(please )*(remove forj|remove kit|forj remove|kit remove) ([a-z0-9]*) *on *(dev|dev-west|dev-east)/i, (msg) ->
     try
       robot.logger.info "#{prefix} responding to -> #{msg.match}"
       kit = msg.match[3]
