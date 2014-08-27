@@ -401,7 +401,7 @@ module.exports = (robot) ->
 # Commands:
 #   catch all other responses
 ###########################
-  robot.respond /*/i, (msg) ->
+  robot.respond /.*/i, (msg) ->
     try
       robot.logger.info "#{prefix} responding to -> #{msg.match}"
     catch err
