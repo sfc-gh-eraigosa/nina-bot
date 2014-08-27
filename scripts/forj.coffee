@@ -397,6 +397,15 @@ module.exports = (robot) ->
     catch err
       robot.emit 'error: forjs age on <dev>', err
 
+###########################
+# Commands:
+#   catch all other responses
+###########################
+  robot.respond /*/i, (msg) ->
+    try
+      robot.logger.info "#{prefix} responding to -> #{msg.match}"
+    catch err
+      robot.emit 'error: catching any message', err
 
 ###########################
 #
