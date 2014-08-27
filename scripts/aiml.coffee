@@ -137,14 +137,19 @@ module.exports = (robot) ->
     else
        robot.logger.error "handling -> #{err.stack}"
 
+  robot.catchAll (msg) ->
+      robot.logger.info "#{prefix} the message -> #{msg.message.text}"
+
 ###########################
 # Commands:
 #   catch all queries
 ###########################
-  robot.catchAll (msg) ->
+  resreg = new RegExp "foo .*", "i"
+  robot.logger.info "#{prefix} after regx"
+  robot.respond resreg, (msg) ->
     try
-      robot.logger.info "#{prefix} responding to -> #{msg.message.text}"
-      msg_input = "#{msg.message.text}"
+      robot.logger.info "#{prefix} responding to -> #{msg.match}"
+      msg_input = "#{msg.match}"
       msgregx = new RegExp("^#{prefix} ")
       msg_input = msg_input.replace msgregx, ""
       robot.logger.info "#{prefix} responding to -> #{msg_input}"
