@@ -117,6 +117,39 @@ execute_kits_age = (msg, branch) ->
   drush_spawn.on "exit", (code) ->
     msg.send "Query complete."
 
+# -----------------------------------
+# aiml bot response
+# -----------------------------------
+aiml_response = (robot, msg) ->
+  robot.logger.info "handel #{msg}"
+  msg_input = "#{msg.match}"
+  msgregx = new RegExp("^#{prefix} ")
+  msg_input = msg_input.replace msgregx, ""
+  robot.logger.info "#{prefix} responding to -> #{msg_input}"
+  url   = "http://chat.forj.io/ProgramO/chatbot/conversation_start.php"
+  say   = "?say=%22#{msg_input}%22"
+  id    = "&convo_id=#{msg.envelope.user.name}"
+  bot   = "&bot_id=1"
+  formt = "&format=json"
+  robot.logger.info "#{url}#{say}#{id}#{bot}#{formt}"
+  robot.http("#{url}#{say}#{id}#{bot}#{formt}").get() (err, r, body) ->
+    robot.logger.info "#{prefix} r -> #{r.statusCode}"
+    if !err
+      data = JSON.parse(body)
+      switch r.statusCode
+        when 200
+          robot.logger.info "#{prefix} id -> #{data.convo_id}"
+          robot.logger.info "#{prefix} usersay -> #{data.usersay}"
+          robot.logger.info "#{prefix} botsay -> #{data.botsay}"
+          msg.send data.botsay
+        else
+          robot.logger.error "#{prefix} got non 200 response."
+          msg.send "There was a problem with my connection to chatbot: #{res.statusCode}) #{data}."
+          robot.emit "error: with #{prefix}", err
+    else
+      robot.logger.error "#{prefix} got error response."
+      msg.send "There was a problem with chatbot: #{err}."
+      robot.emit "error: with #{prefix}", err
 
 # -----------------------------------
 # main robot forj brain
@@ -137,46 +170,19 @@ module.exports = (robot) ->
     else
        robot.logger.error "handling -> #{err.stack}"
 
-  robot.catchAll (msg) ->
-      robot.logger.info "#{prefix} the message -> #{msg.message.text}"
+#      robot.logger.info "#{prefix} the message -> #{msg.message.text}"
 
 ###########################
 # Commands:
 #   catch all queries
 ###########################
-  resreg = new RegExp "foo .*", "i"
-  robot.logger.info "#{prefix} after regx"
-  robot.respond resreg, (msg) ->
+#  resreg = new RegExp ".*", "i"
+#  robot.logger.info "#{prefix} after regx"
+#  robot.respond resreg, (msg) ->
+  robot.catchAll (msg) ->
     try
-      robot.logger.info "#{prefix} responding to -> #{msg.match}"
-      msg_input = "#{msg.match}"
-      msgregx = new RegExp("^#{prefix} ")
-      msg_input = msg_input.replace msgregx, ""
-      robot.logger.info "#{prefix} responding to -> #{msg_input}"
-      url   = "http://chat.forj.io/ProgramO/chatbot/conversation_start.php"
-      say   = "?say=%22#{msg_input}%22"
-      id    = "&convo_id=#{msg.envelope.user.name}"
-      bot   = "&bot_id=1"
-      formt = "&format=json"
-      robot.logger.info "#{url}#{say}#{id}#{bot}#{formt}"
-      robot.http("#{url}#{say}#{id}#{bot}#{formt}").get() (err, r, body) ->
-        robot.logger.info "#{prefix} r -> #{r.statusCode}"
-        if !err
-          data = JSON.parse(body)
-          switch r.statusCode
-            when 200
-              robot.logger.info "#{prefix} id -> #{data.convo_id}"
-              robot.logger.info "#{prefix} usersay -> #{data.usersay}"
-              robot.logger.info "#{prefix} botsay -> #{data.botsay}"
-              msg.send data.botsay
-            else
-              robot.logger.error "#{prefix} got non 200 response."
-              msg.send "There was a problem with my connection to chatbot: #{res.statusCode}) #{data}."
-              robot.emit "error: with #{prefix}", err
-        else
-          robot.logger.error "#{prefix} got error response."
-          msg.send "There was a problem with chatbot: #{err}."
-          robot.emit "error: with #{prefix}", err
+      robot.logger.info "#{prefix} responding to -> #{msg.message.text}"
+      aiml_response robot, msg
     catch err
       robot.emit 'error: catching any message', err
 
