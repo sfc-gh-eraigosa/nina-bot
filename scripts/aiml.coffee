@@ -189,5 +189,19 @@ module.exports = (robot) ->
       robot.emit 'error: catching any message', err
 
 ###########################
+# Greet the admins:
+###########################
+  robot.enter (response) ->
+    try
+      robot.logger.info "#{response.message.user.name} has entered the room."
+      if process.env.HUBOT_AUTH_ADMIN?
+        admins = process.env.HUBOT_AUTH_ADMIN.split ','
+      else
+        admins = []
+      if response.message.user.name in admins
+        aiml_response robot, prefix, "Hi it's #{response.message.user.name}"
+    catch err
+      robot.emit 'error: response robot.enter'
+###########################
 #
 ###########################
