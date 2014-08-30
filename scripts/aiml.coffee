@@ -185,6 +185,9 @@ module.exports = (robot) ->
       if new RegExp("#{prefix}").test(msg.message.text)
         robot.logger.info "#{prefix} responding to -> #{msg.message.text}"
         aiml_response robot, prefix, msg
+      else
+        if msg.message.text != undefined and msg.message.text != ""
+          robot.logger.info "watching #{msg.message.text}"
     catch err
       robot.emit 'error: catching any message', err
 
