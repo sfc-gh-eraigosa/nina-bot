@@ -23,6 +23,7 @@ fi
 nohup bin/hubot -n nina-bot -a xmpp >> "${LOG_FILE}" 2>&1 &
 cd "${_CWD}"
 
+sleep 10
 if [ "$(pgrep node)" = "" ]; then
   echo "bin/hubot failed to start"
   tail -20 "${LOG_FILE}"
