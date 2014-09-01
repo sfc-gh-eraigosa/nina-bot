@@ -6,11 +6,12 @@
 #   npm install irc
 #
 # Configuration:
-#   IRC_WATCH_SERVER   - hostname for irc server
-#   IRC_WATCH_PORT     - port for irc server
-#   IRC_WATCH_CHANNELS - array list of channels to watch
-#   IRC_WATCH_BOTNAME  - name of the bot to use
-#   IRC_WATCH_BOTPASS  - password of the bot
+#   IRC_WATCH_SERVER    - hostname for irc server
+#   IRC_WATCH_PORT      - port for irc server
+#   IRC_WATCH_CHANNELS  - array list of channels to watch
+#   IRC_WATCH_BOTNAME   - name of the bot to use
+#   IRC_WATCH_BOTPASS   - password of the bot
+#   IRC_WATCH_TALK_ROOM - the room to use when relaying messages on adapter
 #
 # Commands:
 #   None
@@ -30,13 +31,14 @@ irc = require "irc"
 module.exports = (robot) ->
   prefix = robot.alias or robot.name
 # get config
-  irc_watch_channels = process.env.IRC_WATCH_CHANNELS or ''
-  irc_watch_channels = irc_watch_channels.split ',' if irc_watch_channels != '' 
-  irc_watch_channels = [] if irc_watch_channels == '' 
-  irc_watch_server   = process.env.IRC_WATCH_SERVER or 'irc.freenode.net'
-  irc_watch_port     = process.env.IRC_WATCH_PORT or 6667
-  irc_watch_botname  = process.env.IRC_WATCH_BOTNAME or "#{prefix}-watch"
-  irc_watch_botpass  = process.env.IRC_WATCH_BOTPASS or ''
+  irc_watch_channels  = process.env.IRC_WATCH_CHANNELS or ''
+  irc_watch_channels  = irc_watch_channels.split ',' if irc_watch_channels != '' 
+  irc_watch_channels  = [] if irc_watch_channels == '' 
+  irc_watch_server    = process.env.IRC_WATCH_SERVER or 'irc.freenode.net'
+  irc_watch_port      = process.env.IRC_WATCH_PORT or 6667
+  irc_watch_botname   = process.env.IRC_WATCH_BOTNAME or "#{prefix}-watch"
+  irc_watch_botpass   = process.env.IRC_WATCH_BOTPASS or ''
+  irc_watch_talk_room = process.env.IRC_WATCH_TALK_ROOM or ''
   # options
   options = {
       userName: irc_watch_botname,
@@ -82,7 +84,7 @@ module.exports = (robot) ->
     robot.logger.debug "nina-bot-watch got to   -> #{to}"
     robot.logger.debug "nina-bot-watch got text -> #{text}"
     robot.logger.debug "nina-bot-watch got msg  -> #{message}"
-    robot.messageRoom 'forj@conference.chat.forj.io', "#{to}->#{from} > #{text}"
+    robot.messageRoom irc_watch_talk_room, "#{to}->#{from} > #{text}"
 
 
 ###########################
