@@ -80,11 +80,14 @@ module.exports = (robot) ->
 ###########################
 
   bot.addListener "message", (from, to, text, message) ->
-    robot.logger.debug "nina-bot-watch got from -> #{from}"
-    robot.logger.debug "nina-bot-watch got to   -> #{to}"
-    robot.logger.debug "nina-bot-watch got text -> #{text}"
-    robot.logger.debug "nina-bot-watch got msg  -> #{message}"
-    robot.messageRoom irc_watch_talk_room, "#{to}->#{from} > #{text}"
+    try
+      robot.logger.debug "nina-bot-watch got from -> #{from}"
+      robot.logger.debug "nina-bot-watch got to   -> #{to}"
+      robot.logger.debug "nina-bot-watch got text -> #{text}"
+      robot.logger.debug "nina-bot-watch got msg  -> #{message}"
+      robot.messageRoom irc_watch_talk_room, "#{to}->#{from} > #{text}"
+    catch err
+      robot.emit 'error: response robot.enter'     
 
 
 ###########################
