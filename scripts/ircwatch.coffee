@@ -82,7 +82,7 @@ module.exports = (robot) ->
     robot.logger.debug "nina-bot-watch got to   -> #{to}"
     robot.logger.debug "nina-bot-watch got text -> #{text}"
     robot.logger.debug "nina-bot-watch got msg  -> #{message}"
-    robot.send from, "#{to}->#{from} > #{text}"
+    robot.messageRoom 'forj', "#{to}->#{from} > #{text}"
 
 
 ###########################
