@@ -22,26 +22,45 @@
 # -----------------------------------
 # setup for irc watch
 # -----------------------------------
-// Create the configuration
-var config = {
-    channels: ["#forj", "#cdkdev"],
-      server: "irc.freenode.net",
-      botName: "nina-bot-watch"
-};
-
-// Get the lib
-var irc = require("irc");
-
-// Create the bot name
-var bot = new irc.Client(config.server, config.botName, {
-    channels: config.channels
-});
+irc = require "irc"
 
 # -----------------------------------
 # main robot forj brain
 # -----------------------------------
 module.exports = (robot) ->
   prefix = robot.alias or robot.name
+# get config
+  irc_watch_channels = process.env.IRC_WATCH_CHANNELS or ''
+  irc_watch_channels = irc_watch_channels.split ',' if irc_watch_channels != '' 
+  irc_watch_channels = [] if irc_watch_channels == '' 
+  irc_watch_server   = process.env.IRC_WATCH_SERVER or 'irc.freenode.net'
+  irc_watch_port     = process.env.IRC_WATCH_PORT or 6667
+  irc_watch_botname  = process.env.IRC_WATCH_BOTNAME or "#{prefix}-watch"
+  irc_watch_botpass  = process.env.IRC_WATCH_BOTPASS or ''
+  # options
+  options = {
+      userName: irc_watch_botname,
+      realName: "bot #{irc_watch_botname}",
+      port: irc_watch_port,
+      debug: false,
+      showErrors: false,
+      autoRejoin: true,
+      autoConnect: true,
+      channels: irc_watch_channels,
+      secure: false,
+      selfSigned: false,
+      certExpired: false,
+      floodProtection: false,
+      floodProtectionDelay: 1000,
+      sasl: false,
+      stripColors: false,
+      channelPrefixes: "&#",
+      messageSplit: 512
+  };
+
+
+  # Create the bot name
+  bot = new irc.Client irc_watch_server, irc_watch_botname, options
   robot.logger.info "processing #{prefix} aiml brain "
 
 ###########################
@@ -58,10 +77,13 @@ module.exports = (robot) ->
 # listen to all messages
 ###########################
 
-  bot.addListener("message", function(from, to, text, message) {
-  #    bot.say(config.channels[0], "¿Public que?");
-      robot.emit message, {user: 'nina-bot'}
-  });
+  bot.addListener "message", (from, to, text, message) ->
+    robot.logger.debug "nina-bot-watch got from -> #{from}"
+    robot.logger.debug "nina-bot-watch got to   -> #{to}"
+    robot.logger.debug "nina-bot-watch got text -> #{text}"
+    robot.logger.debug "nina-bot-watch got msg  -> #{message}"
+    robot.send from, "#{to}->#{from} > #{text}"
+
 
 ###########################
 #
