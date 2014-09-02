@@ -42,7 +42,7 @@ module.exports = (robot) ->
   irc_watch_botname   = process.env.IRC_WATCH_BOTNAME or "#{prefix}-watch"
   irc_watch_botpass   = process.env.IRC_WATCH_BOTPASS or ''
   irc_watch_talk_room = process.env.IRC_WATCH_TALK_ROOM or ''
-  irc_watch_resp_ptrn = process.env.IRC_WATCH_RESP_PTRN or '(${channel})/${from}> '
+  irc_watch_resp_ptrn = process.env.IRC_WATCH_RESP_PTRN or '[${channel}]:${from}> '
   # options
   options = {
       userName: irc_watch_botname,
@@ -90,8 +90,8 @@ module.exports = (robot) ->
       robot.logger.debug "nina-bot-watch got channel -> #{channel}"
       robot.logger.debug "nina-bot-watch got text    -> #{text}"
       robot.logger.debug "nina-bot-watch got msg     -> #{message}"
-      prompt = irc_watch_resp_ptrn.replace new RegExp("\$\{channel\}"), channel
-      prompt = prompt.replace new RegExp("\$\{from\}"), from
+      prompt = irc_watch_resp_ptrn.replace new RegExp("\\${channel}"), channel
+      prompt = prompt.replace new RegExp("\\${from}"), from
       robot.messageRoom irc_watch_talk_room, "#{prompt}#{text}"
     catch err
       robot.emit 'error: response robot.enter'     
