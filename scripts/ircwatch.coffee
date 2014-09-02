@@ -12,6 +12,9 @@
 #   IRC_WATCH_BOTNAME   - name of the bot to use
 #   IRC_WATCH_BOTPASS   - password of the bot
 #   IRC_WATCH_TALK_ROOM - the room to use when relaying messages on adapter
+#   IRC_WATCH_RESP_PTRN - response pattern to use from watched irc channels
+#                         use ${channel} to the channel name
+#                         and ${from} for the name of the user the message is from.
 #
 # Commands:
 #   None
@@ -39,6 +42,7 @@ module.exports = (robot) ->
   irc_watch_botname   = process.env.IRC_WATCH_BOTNAME or "#{prefix}-watch"
   irc_watch_botpass   = process.env.IRC_WATCH_BOTPASS or ''
   irc_watch_talk_room = process.env.IRC_WATCH_TALK_ROOM or ''
+  irc_watch_resp_ptrn = process.env.IRC_WATCH_RESP_PTRN or '(${channel})/${from}> '
   # options
   options = {
       userName: irc_watch_botname,
@@ -79,13 +83,16 @@ module.exports = (robot) ->
 # listen to all messages
 ###########################
 
-  bot.addListener "message", (from, to, text, message) ->
+  bot.addListener "message", (from, channel, text, message) ->
     try
-      robot.logger.debug "nina-bot-watch got from -> #{from}"
-      robot.logger.debug "nina-bot-watch got to   -> #{to}"
-      robot.logger.debug "nina-bot-watch got text -> #{text}"
-      robot.logger.debug "nina-bot-watch got msg  -> #{message}"
-      robot.messageRoom irc_watch_talk_room, "#{to}->#{from} > #{text}"
+      irc_watch_resp_ptrn  # '(${channel})/${from} >'
+      robot.logger.debug "nina-bot-watch got from    -> #{from}"
+      robot.logger.debug "nina-bot-watch got channel -> #{channel}"
+      robot.logger.debug "nina-bot-watch got text    -> #{text}"
+      robot.logger.debug "nina-bot-watch got msg     -> #{message}"
+      prompt = irc_watch_resp_ptrn.replace new RegExp("\$\{channel\}"), channel
+      prompt = prompt.replace new RegExp("\$\{from\}"), from
+      robot.messageRoom irc_watch_talk_room, "#{prompt}#{text}"
     catch err
       robot.emit 'error: response robot.enter'     
 
