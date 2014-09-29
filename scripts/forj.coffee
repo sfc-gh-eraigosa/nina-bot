@@ -20,103 +20,45 @@ getForjPortalURL = (env) ->
 # generalized spawn method
 # -----------------------------------
 execute_hpcloud = (msg, branch) ->
-  drush_spawn = spawn("hpcloud_cdk.sh", [ '--a' , branch ])
-
-  drush_spawn.stdout.on "data", (data) ->
-    msg.send "#{data}"
-
-  drush_spawn.stderr.on "data", (data) ->
-    msg.send "Err: #{data}"
-
-  drush_spawn.on "exit", (code) ->
-    msg.send "Query complete."
+  run_cmd(msg, "hpcloud_cdk.sh", "--a #{branch}")
 
 # -----------------------------------
 # remove forj from account
 # -----------------------------------
 execute_hpcloud_remove = (msg, forj, env) ->
-  drush_spawn = spawn("hpcloud_cdk.sh", [ '--a', env, '--prefix', forj, '--remove-kit', '--nono' ])
-
-  drush_spawn.stdout.on "data", (data) ->
-    msg.send "#{data}"
-
-  drush_spawn.stderr.on "data", (data) ->
-    msg.send "Err: #{data}"
+  run_cmd(msg, "hpcloud_cdk.sh", "--a #{env} --prefix #{forj} --remove-kit --nono")
 
 # -----------------------------------
 # get node ip addresses
 # -----------------------------------
 execute_hpcloud_ip = (msg, kit, branch) ->
-  drush_spawn = spawn("hpcloud_cdk.sh", [ '--a', branch, '--prefix', kit, '--only-ip' ])
-
-  drush_spawn.stdout.on "data", (data) ->
-    msg.send "#{data}"
-
-  drush_spawn.stderr.on "data", (data) ->
-    msg.send "Err: #{data}"
-
-  drush_spawn.on "exit", (code) ->
-    msg.send "Query complete."
+  run_cmd(msg, "hpcloud_cdk.sh", "--a #{branch} --prefix #{kit} --only-ip")
 
 # -----------------------------------
 # execute command
 # -----------------------------------
 execute_hpcloud_go = (msg) ->
-  drush_spawn = spawn("hpcloud_cdk.sh", [ '--a', 'dev', '--nono', '--go' ])
-
-  drush_spawn.stdout.on "data", (data) ->
-    msg.send "#{data}"
-
-  drush_spawn.stderr.on "data", (data) ->
-    msg.send "Err: #{data}"
-
-  drush_spawn.on "exit", (code) ->
-    msg.send "Action done."
+  run_cmd(msg, "hpcloud_cdk.sh", "--a dev --nono --go")
 
 # -----------------------------------
 # abort hpcloud command
 # -----------------------------------
 execute_hpcloud_abort = (msg) ->
-  drush_spawn = spawn("hpcloud_cdk.sh", [ '--a', 'dev', '--nono', '--abort' ])
-
-  drush_spawn.stdout.on "data", (data) ->
-    msg.send "#{data}"
-
-  drush_spawn.stderr.on "data", (data) ->
-    msg.send "Err: #{data}"
+  run_cmd(msg, "hpcloud_cdk.sh", "--a dev --nono --abort")
 
 # -----------------------------------
 # who has a registered forj
 # -----------------------------------
 execute_kits_reg = (msg, branch) ->
   url = getForjPortalURL(branch)
-  drush_spawn = spawn("registered.sh", [branch, url])
-
-  drush_spawn.stdout.on "data", (data) ->
-    msg.send "#{data}"
-
-  drush_spawn.stderr.on "data", (data) ->
-    msg.send "Err: #{data}"
-
-  drush_spawn.on "exit", (code) ->
-    msg.send "Query complete."
+  run_cmd(msg, "registered.sh", "#{branch} #{url}")
 
 # -----------------------------------
 # how old are the forjs on this account
 # -----------------------------------
 execute_kits_age = (msg, branch) ->
   url = getForjPortalURL(branch)
-  drush_spawn = spawn("serverage.sh", [branch, url])
-
-  drush_spawn.stdout.on "data", (data) ->
-    msg.send "#{data}"
-
-  drush_spawn.stderr.on "data", (data) ->
-    msg.send "Err: #{data}"
-
-  drush_spawn.on "exit", (code) ->
-    msg.send "Query complete."
-
+  run_cmd(msg, "serverage.sh", "#{branch} #{url}")
 
 # -----------------------------------
 # main robot forj brain
@@ -397,6 +339,27 @@ module.exports = (robot) ->
     catch err
       robot.emit 'error: forjs age on <dev>', err
 
+###########################
+# Private: execute a command
+#          Takes care of additional carriage returns
+###########################
+run_cmd = (msg, cmd_name, cmd_args) ->
+  cmd_spawn = spawn(cmd_name, cmd_args.split " ")
+  cmd_spawn.stdout.on "data", (data) ->
+    msg.send "#{data}".replace /\n+$/g, ""
+  cmd_spawn.stderr.on "data", (data) ->
+    msg.send "Err: #{data}".replace /\n+$/g, ""
+  cmd_spawn.on "exit", (code) ->
+    msg.send "Done (exit with rc=#{code})."
+
+###########################
+# Private: execute a command in blocking mode
+###########################
+run_cmd_block = (msg, cmd_name, cmd_args) ->
+  exec cmd_name + " " + cmd_args, (error, stdout, stderr) ->
+    msg.send error
+    msg.send stdout
+    msg.send stderr
 ###########################
 #
 ###########################
