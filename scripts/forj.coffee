@@ -1,7 +1,15 @@
-
-# commands:
+# Description
+#   Queries your forj on any project (dev|dev-west|dev-east|itg|test|test-stable|pro|stable)
 #
-# Query our kits...
+# Configuration:
+#   N/A
+#
+# Commands:
+#   hubot kit help - Displays detailed forj commands
+#   hubot forj help - Displays detailed forj commands
+#
+# Author:
+#   ojacques
 
 spawn = require('child_process').spawn
 util = require('util')
