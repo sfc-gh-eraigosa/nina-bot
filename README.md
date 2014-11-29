@@ -8,6 +8,10 @@ This version is designed to be deployed on [Heroku][heroku]. This README was gen
 
 ### Testing Hubot Locally
 
+#### Prerequisites (CentOS v6)
+* Make sure your version of Node is not a "pre" version (i.e. running ``node -v``` returns a version string that does not contain "pre")
+* Install libicu-devel if necessary:  ```sudo yum install libicu-devel```
+
 You can test your hubot by running the following.
 
     % bin/hubot
@@ -155,3 +159,4 @@ Add the subdomain hubot should connect to. If you web URL looks like
 
 You may want to get comfortable with `heroku logs` and `heroku restart`
 if you're having issues.
+
